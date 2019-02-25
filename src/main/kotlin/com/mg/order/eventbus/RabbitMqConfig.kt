@@ -3,6 +3,9 @@ package com.mg.order.eventbus
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -11,21 +14,42 @@ import org.springframework.context.annotation.Configuration
 class RabbitMqConfig {
 
     companion object {
-        const val ROUTING_KEY = "product.key"
-        const val EXCHANGE_ORDER_GENERAL = "order_general"
-        const val EXCHANGE_ORDER_PLACED = "exchange_order_placed"
+        const val ROUTING_KEY_ORDER_ALL = "order.#"
+        const val QUEUE_ORDER_ALL = "order.all"
+        const val QUEUE_ORDER_CREATED = "order.created"
+        const val QUEUE_ORDER_PLACED = "order.placed"
+        const val EXCHANGE_ORDER = "order"
     }
 
     @Bean
-    fun queue(): Queue = Queue(ROUTING_KEY, true)
+    fun exchangeOrder(): TopicExchange = TopicExchange(EXCHANGE_ORDER)
 
     @Bean
-    fun exhangeOrderGeneral(): TopicExchange = TopicExchange(EXCHANGE_ORDER_GENERAL)
+    fun queueOrderCreated(): Queue = Queue(QUEUE_ORDER_CREATED)
 
     @Bean
-    fun exhangeOrderIsPlaced(): TopicExchange = TopicExchange(EXCHANGE_ORDER_PLACED)
+    fun queueOrderPlaced(): Queue = Queue(QUEUE_ORDER_PLACED)
 
     @Bean
-    fun binding(queue: Queue, exchange: TopicExchange) = BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY)
+    fun queueOrderAll(): Queue = Queue(QUEUE_ORDER_ALL)
+
+    @Bean
+    fun bindingCreated() = BindingBuilder.bind(queueOrderCreated()).to(exchangeOrder()).with(QUEUE_ORDER_CREATED)
+
+    @Bean
+    fun bindingPlaced() = BindingBuilder.bind(queueOrderPlaced()).to(exchangeOrder()).with(QUEUE_ORDER_PLACED)
+
+    @Bean
+    fun bindingAll() = BindingBuilder.bind(queueOrderAll()).to(exchangeOrder()).with(ROUTING_KEY_ORDER_ALL)
+
+    @Bean
+    fun messageConverter() = Jackson2JsonMessageConverter()
+
+    @Bean
+    fun rabbitTemplate(connectionFactory: ConnectionFactory): RabbitTemplate {
+        val rabbitTemplate = RabbitTemplate(connectionFactory)
+        rabbitTemplate.messageConverter = messageConverter()
+        return rabbitTemplate
+    }
 
 }
