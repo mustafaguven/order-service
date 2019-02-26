@@ -1,17 +1,14 @@
-package com.mg.order.eventbus
+package com.mg.order.event_messaging
 
+import com.mg.eventbus.RabbitMqConfig
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
-import org.springframework.amqp.rabbit.connection.ConnectionFactory
-import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-
 @Configuration
-class RabbitMqConfig {
+class OrderMessageConfig : RabbitMqConfig() {
 
     companion object {
         const val ROUTING_KEY_ORDER_ALL = "order.#"
@@ -41,15 +38,5 @@ class RabbitMqConfig {
 
     @Bean
     fun bindingAll() = BindingBuilder.bind(queueOrderAll()).to(exchangeOrder()).with(ROUTING_KEY_ORDER_ALL)
-
-    @Bean
-    fun messageConverter() = Jackson2JsonMessageConverter()
-
-    @Bean
-    fun rabbitTemplate(connectionFactory: ConnectionFactory): RabbitTemplate {
-        val rabbitTemplate = RabbitTemplate(connectionFactory)
-        rabbitTemplate.messageConverter = messageConverter()
-        return rabbitTemplate
-    }
 
 }

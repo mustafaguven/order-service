@@ -1,6 +1,6 @@
 package com.mg.order.controller
 
-import com.mg.order.eventbus.producer.MessageProducer
+import com.mg.order.event_messaging.publish.OrderMessageProducer
 import com.mg.order.model.Order
 import com.mg.order.model.Product
 import com.mg.order.services.ProductService
@@ -12,7 +12,8 @@ import java.util.*
 
 @RefreshScope
 @RestController
-class OrderController(val messageProducer: MessageProducer, val productService: ProductService) : AbstractController() {
+class OrderController(val messageProducer: OrderMessageProducer,
+                      val productService: ProductService) : AbstractController() {
 
     @Value("\${app.id}")
     private val instance: String? = null
@@ -32,7 +33,6 @@ class OrderController(val messageProducer: MessageProducer, val productService: 
         return order
     }
 
-
     @RequestMapping(value = ["/{id}"])
     fun getOrder(@PathVariable("id") id: Int?): Order {
         return Order(id = id ?: -1)
@@ -42,7 +42,6 @@ class OrderController(val messageProducer: MessageProducer, val productService: 
     fun getProducts(@PathVariable("id") id: Int?): Product {
         return productService.getProductsByOrderId(id)
     }
-
 
     fun fallback(): ArrayList<Order> {
         val products = ArrayList<Order>()
