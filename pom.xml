@@ -11,6 +11,14 @@
 	<artifactId>order-service</artifactId>
 	<packaging>jar</packaging>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.mg</groupId>
+			<artifactId>event-handler-service</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
 	</properties>

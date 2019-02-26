@@ -25,13 +25,13 @@ class RabbitMqConfig {
     fun exchangeOrder(): TopicExchange = TopicExchange(EXCHANGE_ORDER)
 
     @Bean
-    fun queueOrderCreated(): Queue = Queue(QUEUE_ORDER_CREATED)
+    fun queueOrderCreated() = Queue(QUEUE_ORDER_CREATED)
 
     @Bean
-    fun queueOrderPlaced(): Queue = Queue(QUEUE_ORDER_PLACED)
+    fun queueOrderPlaced() = Queue(QUEUE_ORDER_PLACED)
 
     @Bean
-    fun queueOrderAll(): Queue = Queue(QUEUE_ORDER_ALL)
+    fun queueOrderAll() = Queue(QUEUE_ORDER_ALL)
 
     @Bean
     fun bindingCreated() = BindingBuilder.bind(queueOrderCreated()).to(exchangeOrder()).with(QUEUE_ORDER_CREATED)

@@ -2,18 +2,17 @@ package com.mg.order.controller
 
 import com.mg.order.eventbus.producer.MessageProducer
 import com.mg.order.model.Order
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand
-import org.springframework.beans.factory.annotation.Autowired
+import com.mg.order.model.Product
+import com.mg.order.services.ProductService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import kotlin.collections.HashMap
 
 
 @RefreshScope
 @RestController
-class OrderController(val messageProducer: MessageProducer) : AbstractController() {
+class OrderController(val messageProducer: MessageProducer, val productService: ProductService) : AbstractController() {
 
     @Value("\${app.id}")
     private val instance: String? = null
@@ -33,10 +32,17 @@ class OrderController(val messageProducer: MessageProducer) : AbstractController
         return order
     }
 
+
     @RequestMapping(value = ["/{id}"])
     fun getOrder(@PathVariable("id") id: Int?): Order {
         return Order(id = id ?: -1)
     }
+
+    @RequestMapping(value = ["/{id}/products"])
+    fun getProducts(@PathVariable("id") id: Int?): Product {
+        return productService.getProductsByOrderId(id)
+    }
+
 
     fun fallback(): ArrayList<Order> {
         val products = ArrayList<Order>()
